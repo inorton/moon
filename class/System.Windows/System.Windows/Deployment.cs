@@ -195,7 +195,7 @@ namespace System.Windows {
 
 		internal string XapDir {
 			get {
-				return xap_dir;
+				return xap_dir ?? String.Empty; 
 			}
 			set {
 				xap_dir = value;
@@ -303,6 +303,9 @@ namespace System.Windows {
 				throw new MoonException (2105, e.Message);
 			}
 		}
+#if !NET_2_1
+    public static List<Assembly> PreloadDesktopAssemblies = new List<Assembly>();
+#endif
 
 		internal bool InitializeDeployment (string culture, string uiCulture)
 		{
@@ -313,7 +316,11 @@ namespace System.Windows {
 				EntryPointType = "System.Windows.Application";
 				EntryPointAssembly = typeof (Application).Assembly.GetName ().Name;
 				EntryAssembly = typeof (Application).Assembly;
+#if NET_2_1
 				return LoadAssemblies ();
+#else
+        return LoadAssemblies ( PreloadDesktopAssemblies );
+#endif
 			}
 			finally {
 				NativeMethods.deployment_set_initialization (native, false);
@@ -415,10 +422,19 @@ namespace System.Windows {
 			return true;
 		}
 
-		// note: throwing MoonException from here is ok since this code is called (sync) from the plugin
 		internal bool LoadAssemblies ()
+    {
+       return LoadAssemblies( new List<Assembly>() );
+    }
+
+		// note: throwing MoonException from here is ok since this code is called (sync) from the plugin
+		internal bool LoadAssemblies ( List<Assembly> loaded )
 		{
-			assemblies = new List <Assembly> ();
+      if ( loaded != null ) {
+  			assemblies = new List<Assembly>( loaded );
+      } else {
+        assemblies = new List<Assembly>();
+      }
 			assemblies.Add (typeof (Application).Assembly);
 			
 			pending_downloads = 0;
