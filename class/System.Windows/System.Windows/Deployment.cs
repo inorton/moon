@@ -304,7 +304,7 @@ namespace System.Windows {
 			}
 		}
 #if !NET_2_1
-    public static List<Assembly> PreloadDesktopAssemblies = new List<Assembly>();
+		public static List<Assembly> PreloadDesktopAssemblies = new List<Assembly>();
 #endif
 
 		internal bool InitializeDeployment (string culture, string uiCulture)
@@ -319,7 +319,7 @@ namespace System.Windows {
 #if NET_2_1
 				return LoadAssemblies ();
 #else
-        return LoadAssemblies ( PreloadDesktopAssemblies );
+        return LoadAssemblies ( PreloadDesktopAssemblies, true );
 #endif
 			}
 			finally {
@@ -424,19 +424,21 @@ namespace System.Windows {
 
 		internal bool LoadAssemblies ()
     {
-       return LoadAssemblies( new List<Assembly>() );
+       return LoadAssemblies( new List<Assembly>(), false );
     }
 
 		// note: throwing MoonException from here is ok since this code is called (sync) from the plugin
-		internal bool LoadAssemblies ( List<Assembly> loaded )
+		internal bool LoadAssemblies ( List<Assembly> loaded, bool IsDesktop )
 		{
-      if ( loaded != null ) {
-  			assemblies = new List<Assembly>( loaded );
+			if ( IsDesktop ){
+        assemblies = loaded;
+			  assemblies.Add (typeof (Application).Assembly);
+        return CreateApplication();
       } else {
         assemblies = new List<Assembly>();
+  			assemblies.Add (typeof (Application).Assembly);
       }
-			assemblies.Add (typeof (Application).Assembly);
-			
+
 			pending_downloads = 0;
 
 			for (int i = 0; i < ExternalParts.Count; i++) {
