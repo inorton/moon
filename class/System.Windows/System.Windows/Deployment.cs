@@ -319,7 +319,7 @@ namespace System.Windows {
 #if NET_2_1
 				return LoadAssemblies ();
 #else
-        return LoadAssemblies ( PreloadDesktopAssemblies, true );
+				return LoadAssemblies ( PreloadDesktopAssemblies, true );
 #endif
 			}
 			finally {
@@ -423,21 +423,21 @@ namespace System.Windows {
 		}
 
 		internal bool LoadAssemblies ()
-    {
-       return LoadAssemblies( new List<Assembly>(), false );
-    }
+		{
+			return LoadAssemblies( new List<Assembly>(), false );
+		}
 
 		// note: throwing MoonException from here is ok since this code is called (sync) from the plugin
 		internal bool LoadAssemblies ( List<Assembly> loaded, bool IsDesktop )
 		{
 			if ( IsDesktop ){
-        assemblies = loaded;
-			  assemblies.Add (typeof (Application).Assembly);
-        return CreateApplication();
-      } else {
-        assemblies = new List<Assembly>();
-  			assemblies.Add (typeof (Application).Assembly);
-      }
+        		assemblies = loaded;
+				assemblies.Add (typeof (Application).Assembly);
+				return CreateApplication();
+			} else {
+				assemblies = new List<Assembly>();
+				assemblies.Add (typeof (Application).Assembly);
+			}
 
 			pending_downloads = 0;
 
